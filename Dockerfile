@@ -1,35 +1,20 @@
-FROM openjdk:23-slim-bullseye
+FROM hoainamnv34/zap-base:0.0.1
 LABEL org.opencontainers.image.authors="hoainamnv34"
-
 
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# JMeter version
+# ZAP version
 ARG ZAP_VERSION=2.15.0 
 
-# Install some utilities
-RUN apt-get clean && \
-    apt-get update && \
-    apt-get -qy install \
-                wget \
-                telnet \
-                iputils-ping \
-                unzip
-
-# Install JMeter
-RUN   mkdir /zap \
-      && cd /zap/ \
-      && wget https://github.com/zaproxy/zaproxy/releases/download/v${ZAP_VERSION}/ZAP_${ZAP_VERSION}_Linux.tar.gz \
-      && tar -xzf ZAP_${ZAP_VERSION}_Linux.tar.gz \
-      && rm ZAP_${ZAP_VERSION}_Linux.tar.gz
-
-
 # Set ZAP Home
-ENV JMETER_HOME /zap/ZAP_${ZAP_VERSION}
+ENV ZAP_HOME /zap/ZAP_${ZAP_VERSION}
 
-WORKDIR $JMETER_HOME
+WORKDIR $ZAP_HOME
 
-ENTRYPOINT ["/bin/bash", "zap.sh", "-daemon", "-host", "0.0.0.0", "-port", "8083", "-config", "api.disablekey=true", "-config", "api.addrs.addr.name=.*", "-config", "api.addrs.addr.regex=true"]
+
+ENTRYPOINT ["/bin/bash", "zap.sh", "-daemon", "-host", "0.0.0.0", "-port", "8083", "-config", "api.disablekey=true", "-config", "api.addrs.addr.name=.*", "-config", "api.addrs.addr.regex=true", "-config", "database.recoverylog=false", "-config", "connection.timeoutInSecs=120"]
+
+HEALTHCHECK --retries=5 --interval=5s CMD zap-cli status
 
 
