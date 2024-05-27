@@ -15,6 +15,6 @@ WORKDIR $ZAP_HOME
 
 ENTRYPOINT ["/bin/bash", "zap.sh", "-daemon", "-host", "0.0.0.0", "-port", "8083", "-config", "api.disablekey=true", "-config", "api.addrs.addr.name=.*", "-config", "api.addrs.addr.regex=true", "-config", "database.recoverylog=false", "-config", "connection.timeoutInSecs=120"]
 
-HEALTHCHECK --retries=5 --interval=5s CMD zap-cli status
+# HEALTHCHECK --retries=5 --interval=5s CMD /bin/bash zap.sh status
 
 
